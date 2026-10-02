@@ -18,4 +18,4 @@
 - 决定与理由见 `agents.md`，不要回头加影子、SVG 图示、一级一级点楼梯。
 
 ## 🕐 最后更新
-2026-10-02 · Claude Opus 5.5 @ 这台 Mac · Git：待推
+2026-10-02 · Claude Opus 5.5 @ 这台 Mac · Git：✅ 已推
