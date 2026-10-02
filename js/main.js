@@ -26,6 +26,20 @@ scene.background = new THREE.Color('#05070f');
 const camera = new THREE.PerspectiveCamera(26, 1, 0.5, 200);
 
 const H = buildHouse(scene);
+const TORCH_LUX = 1.15;
+// 不是题目的东西一律哑光：在手电筒下不该出现亮斑，免得学生以为它会发光。
+// 「会骗人的亮东西」（镜子、汤匙、反光条、猫眼）有自己的 glint 材质，不在这里改。
+{
+  const keep = new Set(Object.values(H.items).flatMap((it) => it.glint.map((g) => g.mat)));
+  H.root.traverse((n) => {
+    if (!n.isMesh) return;
+    for (const m of [].concat(n.material)) {
+      if (!m.isMeshStandardMaterial || keep.has(m)) continue;
+      m.roughness = Math.max(m.roughness, 0.8);
+      m.metalness = Math.min(m.metalness, 0.15);
+    }
+  });
+}
 const THUMB = makeThumbs(H);
 // 物件一律用 3D 模型拍的小图；介面功能键（声音、眼睛）才用线条图示
 const IMG = (k) => { const key = k === 'torch' ? 'torch2' : k; return THUMB[key] ? `<img src="${THUMB[key]}" alt="">` : ICON[k]; };
@@ -111,7 +125,7 @@ function resize() {
   if (!cam.cur) cam.cur = { ...frameFor(effectiveRegion()) };
 }
 function effectiveRegion() { return cam.region; }
-function setRegion(key) { cam.region = key; renderRoomBar(); }
+function setRegion(key) { cam.region = key; renderRoomBar(); if (state.stage === 'hunt' && state.rerender) state.rerender(); }
 function updateCamera(dt) {
   const tgt = frameFor(effectiveRegion());
   const k = 1 - Math.exp(-dt * 4);
@@ -121,7 +135,7 @@ function updateCamera(dt) {
   // 手电筒握在观看者手上，比眼睛低一点
   torch.position.set(camera.position.x + 1.2, camera.position.y - cam.cur.dist * 0.12, camera.position.z - 2);
   // 光圈大小固定在屋里约 1.5 格宽，不论镜头远近
-  torch.angle = Math.atan((cam.region === 'all' ? 2.0 : 1.0) / torch.position.distanceTo(torch.target.position));
+  torch.angle = Math.atan((cam.region === 'all' ? 3.0 : 1.0) / torch.position.distanceTo(torch.target.position));
 }
 
 function renderRoomBar() {
@@ -151,7 +165,8 @@ function applyEnv(dt) {
   skyLight.color.set(D > 0.05 ? '#ffd9a0' : '#8fa8ff');
   skyLight.intensity = 0.45 + D * 3.2;
   skyLight.position.set(D > 0.05 ? 10 : 7, 6 + D * 8, -14);
-  torch.intensity = 70 * envNow.torch;
+  // 照在东西上的亮度固定（不随镜头远近变亮），白色东西才不会被照到过曝、冒光晕
+  torch.intensity = TORCH_LUX * torch.position.distanceTo(torch.target.position) * envNow.torch;
   for (const f of H.flames) {
     f.group.visible = envNow.flames > 0.05 || (f.group === H.items.torch2.flame);
     f.light.intensity = f.base * envNow.flames * (0.85 + Math.sin(now() * 17 + f.base * 9) * 0.08 + Math.sin(now() * 7.3) * 0.07);
@@ -665,6 +680,7 @@ function stageHunt() {
     actions: a2.found.size === 9 ? [{ label: '下一步：猜一猜', primary: true, onClick: stageSort }] : [],
   });
   render();
+  state.rerender = render;
   state.targets = () => HUNT.filter((k) => !a2.found.has(k)).map((k) => H.items[k]);
   state.onTap = (it, x, y) => {
     a2.found.add(it.id); a2.idleAt = now();
