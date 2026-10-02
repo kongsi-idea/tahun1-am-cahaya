@@ -1,7 +1,7 @@
 # 光的小探险 · 交接
 
 ## ⏯️ 目前做到哪
-v0.1 本机原型完成（2026-10-02），**等老师本机实测**，尚未建 GitHub repo、未部署、未上架 Hub。
+v1.0 已上线（2026-10-02）：https://tahun1-am-cahaya.vercel.app ；GitHub：https://github.com/kongsi-idea/tahun1-am-cahaya ；Vercel team `kongsi-idea`。Hub 已登记（新增科目 `am`＝Alam dan Manusia）。**等老师在学校电脑／投影／触屏实测，回填反馈。**
 规划与已定决定：`../_planning/tahun1-am-cahaya.md`。
 
 ## 🚦 目前状态
@@ -19,8 +19,10 @@ v0.1 本机原型完成（2026-10-02），**等老师本机实测**，尚未建 
 - Tema 5 Standard Prestasi 抄录缺页，评估设计待补。
 
 ## ➡️ 下一步
-1. 老师本机实测：`cd` 本目录 → `python3 -m http.server 8791 --bind 127.0.0.1` → 开 http://127.0.0.1:8791/ （8765 被 Hub 占用）。测试网址加 `?debug` 会挂出 `window.__lab`。
-2. 按反馈修改 → 老师说可以发布 → `gh repo create kongsi-idea/tahun1-am-cahaya` → Vercel（`--scope kongsi-idea`）→ 截图 → Hub 登记。
+1. 老师在学校 Windows 电脑／课室投影／真实触屏实测，回填反馈（效能、一年级不靠读字能否完成第一幕、「比时间」是否要改成比点空次数）。
+2. 按反馈修改 → 部署（`vercel deploy --prod --yes --scope kongsi-idea`）→ Hub 同步升版。
+3. 马来文官方用词核对后，再把 5.1.1–5.1.4 加进 Hub `data/dskp-index.js`。
+本机测试：`python3 -m http.server 8791 --bind 127.0.0.1`（8765 被 Hub 占用），网址加 `?debug`。
 
 ## 🕐 最后更新
 2026-10-02
